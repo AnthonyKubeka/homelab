@@ -1,0 +1,66 @@
+services:
+  caddy:
+    build: /home/commander-shepard/caddy
+    container_name: caddy
+    restart: unless-stopped
+    network_mode: host
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - /opt/homelab/secrets/core/caddy.env
+    volumes:
+      - ${REPO_ROOT}/infra/docker/config/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - /opt/homelab/data/caddy/data:/data
+      - /opt/homelab/data/caddy/config:/config
+
+  adguard:
+    container_name: adguard
+    image: adguard/adguardhome:latest
+    restart: unless-stopped
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "3002:80"   # webUI
+    volumes:
+      - /opt/homelab/data/adguard/work:/opt/adguardhome/work
+      - /opt/homelab/data/adguard/conf:/opt/adguardhome/conf
+
+  forgejo:
+    image: codeberg.org/forgejo/forgejo:10
+    container_name: forgejo
+    restart: unless-stopped
+    env_file:
+      - /opt/homelab/secrets/core/forgejo.env
+    ports:
+      - "3000:3000"
+      - "2222:22"
+    volumes:
+      - /opt/homelab/data/forgejo:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+
+  portainer:
+    image: portainer/portainer-ce:lts
+    container_name: portainer
+    restart: unless-stopped
+    ports:
+      - "9443:9443"
+      - "8000:8000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+  portainer_agent:
+    image: portainer/agent:2.27.4
+    container_name: portainer_agent
+    restart: unless-stopped
+    ports:
+      - "9001:9001"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
+      - /:/host
+
+volumes:
+  portainer_data:
+    name: portainer_data

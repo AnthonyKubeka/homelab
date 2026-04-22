@@ -1,0 +1,53 @@
+
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+adaptive_lighting:
+  - name: living_room
+    lights:
+      - light.living_room_light
+      - light.living_room_atrium_light
+      - light.living_room_floor_light
+      - light.table_light
+
+  - name: kitchen
+    lights: 
+      - light.kitchen_light
+
+  - name: bathroom
+    lights:
+      - light.bathroom_light
+
+  - name: bedroom
+    lights:
+      - light.bedroom_light
+      - light.bedroom_floor_light
+
+  - name: office
+    lights:
+      - light.office_light
+
+  - name: guest_bathroom
+    lights:
+      - light.guest_bathroom_light
+
+homeassistant:
+  external_url: https://homeassistant.anthonykubeka.com
+  internal_url: http://127.0.0.1:8123
+
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 127.0.0.1
+    - ::1
+    - 172.16.0.0/12
+    - 10.0.0.0/8
+    - 100.64.0.0/10

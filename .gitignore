@@ -1,0 +1,17 @@
+
+# runtime state - never commit
+normandy-metadata/
+**/*.log
+**/*.pid
+**/*.db-wal
+**/*.db-shm
+**/*.fastresume
+**/BT_backup/.DS_Store
+**/.DS_Store
+
+# legacy docker/ env files (contain secrets, superseded by /opt/homelab/secrets/)
+docker/.env
+docker/.db.env
+docker/.importer.env
+docker/data/
+docker/logs/

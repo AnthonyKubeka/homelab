@@ -1,0 +1,119 @@
+
+
+(porkbun_tls) {
+	tls {
+		dns porkbun {
+			api_key {$PORKBUN_API_KEY}
+			api_secret_key {$PORKBUN_API_SECRET}
+		}
+	}
+}
+
+adguard.anthonykubeka.com {
+	import porkbun_tls
+	reverse_proxy 127.0.0.1:3002
+}
+
+homepage.anthonykubeka.com {
+	import porkbun_tls
+	reverse_proxy 127.0.0.1:3003
+}
+
+calibre.anthonykubeka.com {
+	import porkbun_tls
+	reverse_proxy 127.0.0.1:8093
+}
+
+prometheus.anthonykubeka.com {
+	import porkbun_tls
+	reverse_proxy 127.0.0.1:9090
+}
+
+grafana.anthonykubeka.com {
+	import porkbun_tls
+	reverse_proxy 127.0.0.1:3001
+}
+
+xbvr.anthonykubeka.com {
+	import porkbun_tls
+	reverse_proxy 127.0.0.1:9999
+}
+
+calibreui.anthonykubeka.com {
+	import porkbun_tls
+	reverse_proxy 127.0.0.1:8092
+}
+
+portainer.anthonykubeka.com {
+	import porkbun_tls
+	reverse_proxy 127.0.0.1:9443 {
+		transport http {
+			tls_insecure_skip_verify
+		}
+	}
+}
+
+forgejo.anthonykubeka.com {
+	import porkbun_tls
+	reverse_proxy 127.0.0.1:3000
+}
+
+e-sync.anthonykubeka.com {
+	import porkbun_tls
+	reverse_proxy 127.0.0.1:8095
+}
+
+homeassistant.anthonykubeka.com {
+	import porkbun_tls
+	reverse_proxy 127.0.0.1:8123
+}
+
+qbittorrent.anthonykubeka.com {
+	import porkbun_tls
+	reverse_proxy 127.0.0.1:8080
+}
+
+radarr.anthonykubeka.com {
+	import porkbun_tls
+	reverse_proxy 127.0.0.1:7878
+}
+
+sonarr.anthonykubeka.com {
+	import porkbun_tls
+	reverse_proxy 127.0.0.1:8989
+}
+
+prowlarr.anthonykubeka.com {
+	import porkbun_tls
+	reverse_proxy 127.0.0.1:9696
+}
+
+flaresolverr.anthonykubeka.com {
+	import porkbun_tls
+	reverse_proxy 127.0.0.1:8191
+}
+
+grocy.anthonykubeka.com {
+	import porkbun_tls
+	reverse_proxy 127.0.0.1:9283
+}
+
+filebrowser.anthonykubeka.com {
+	import porkbun_tls
+	reverse_proxy 127.0.0.1:8081
+}
+
+firefly.anthonykubeka.com {
+	import porkbun_tls
+	reverse_proxy 127.0.0.1:8088
+}
+
+plex.anthonykubeka.com {
+	import porkbun_tls
+	reverse_proxy 127.0.0.1:32400
+}
+
+stash.anthonykubeka.com {
+	import porkbun_tls
+	reverse_proxy 127.0.0.1:11111
+}
