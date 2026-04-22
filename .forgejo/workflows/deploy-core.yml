@@ -1,0 +1,27 @@
+name: Deploy Core
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'infra/docker/compose/core/**'
+      - 'infra/docker/config/caddy/**'
+      - 'infra/scripts/**'
+      - '.forgejo/workflows/deploy-core.yml'
+
+env:
+  REPO_ROOT: /home/commander-shepard/homelab
+
+jobs:
+  deploy:
+    runs-on: normandy
+    steps:
+      - name: Update repo
+        run: |
+          cd $REPO_ROOT
+          git fetch origin
+          git reset --hard origin/main
+
+      - name: Deploy core stack
+        run: $REPO_ROOT/infra/scripts/deploy-stack.sh core

@@ -22,13 +22,28 @@ echo "Repo root: $REPO_ROOT"
 
 bash "$REPO_ROOT/infra/scripts/bootstrap-host.sh"
 
-if [[ "$STACK_NAME" == "core" ]]; then
-  echo "Syncing Caddy config..."
-  mkdir -p /home/commander-shepard/caddy
-  rsync -av \
-    "$REPO_ROOT/infra/docker/config/caddy/" \
-    /home/commander-shepard/caddy/
-fi
+require_secret() {
+  local path="$1"
+  if [[ ! -f "$path" ]]; then
+    echo "ERROR: Required secret missing: $path" >&2
+    exit 1
+  fi
+}
+
+case "$STACK_NAME" in
+  core)
+    require_secret /opt/homelab/secrets/core/caddy.env
+    require_secret /opt/homelab/secrets/core/forgejo.env
+    ;;
+  observability)
+    require_secret /opt/homelab/secrets/observability/grafana.env
+    ;;
+  apps)
+    require_secret /opt/homelab/secrets/apps/firefly.env
+    require_secret /opt/homelab/secrets/apps/firefly-db.env
+    require_secret /opt/homelab/secrets/apps/firefly-importer.env
+    ;;
+esac
 
 cd "$STACK_DIR"
 
@@ -36,18 +51,15 @@ echo "Rendering compose config..."
 docker compose config >/dev/null
 
 if [[ "$STACK_NAME" == "core" ]]; then
-  echo "Updating core stack without tearing it down first..."
+  echo "Updating core stack..."
   docker compose up -d --force-recreate caddy
   docker compose up -d
 else
   echo "Pulling latest images..."
   docker compose pull
-  
-  echo "Stopping existing stack containers..."
-  docker compose down --remove-orphans || true
 
   echo "Starting stack..."
-  docker compose up -d
+  docker compose up -d --remove-orphans
 fi
 
 if [[ "$STACK_NAME" == "core" ]]; then

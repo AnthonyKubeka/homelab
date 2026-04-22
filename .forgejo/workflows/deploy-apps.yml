@@ -1,0 +1,25 @@
+name: Deploy Apps
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'infra/docker/compose/apps/**'
+      - '.forgejo/workflows/deploy-apps.yml'
+
+env:
+  REPO_ROOT: /home/commander-shepard/homelab
+
+jobs:
+  deploy:
+    runs-on: normandy
+    steps:
+      - name: Update repo
+        run: |
+          cd $REPO_ROOT
+          git fetch origin
+          git reset --hard origin/main
+
+      - name: Deploy apps stack
+        run: $REPO_ROOT/infra/scripts/deploy-stack.sh apps
