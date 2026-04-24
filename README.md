@@ -100,7 +100,6 @@ Never committed. Live at `/opt/homelab/secrets/` on the server. Example files ar
 
 ### Prerequisites
 - Ubuntu server (or any systemd-based Linux)
-- Docker + Docker Compose plugin
 - A domain with Porkbun DNS (or adapt the Caddy build for your DNS provider)
 - A Forgejo instance with an Actions runner on the server — can be self-hosted via the `core` stack itself
 
@@ -108,7 +107,21 @@ Never committed. Live at `/opt/homelab/secrets/` on the server. Example files ar
 
 ### Core (required)
 
-#### 1. Clone the repo
+#### 0. Install prerequisites
+
+```bash
+sudo apt update && sudo apt install -y git curl
+```
+
+#### 1. Install Docker
+
+```bash
+curl -fsSL https://get.docker.com | sudo sh
+sudo usermod -aG docker $USER
+newgrp docker  # activates the group for the current shell; log out and back in to make it permanent
+```
+
+#### 2. Clone the repo
 
 ```bash
 sudo mkdir -p /opt/homelab && sudo chown $USER:$USER /opt/homelab
@@ -116,7 +129,7 @@ git clone https://github.com/AnthonyKubeka/homelab.git /opt/homelab/repo
 cd /opt/homelab/repo
 ```
 
-#### 2. Run setup
+#### 3. Run setup
 
 ```bash
 bash infra/scripts/setup.sh
@@ -124,22 +137,32 @@ bash infra/scripts/setup.sh
 
 Creates the base directory structure and copies example secrets into place.
 
-#### 3. Fill in secrets
+#### 4. Fill in secrets
 
 ```bash
-nano /opt/homelab/secrets/core/caddy.env    # PORKBUN_API_KEY, PORKBUN_API_SECRET, HOMELAB_DOMAIN
-nano /opt/homelab/secrets/core/forgejo.env  # update domain references
+nano /opt/homelab/secrets/core/caddy.env
 ```
+Set `PORKBUN_API_KEY`, `PORKBUN_API_SECRET`, and `HOMELAB_DOMAIN` (your root domain, e.g. `yourdomain.com`).
 
-#### 4. Build the custom Caddy binary
+```bash
+nano /opt/homelab/secrets/core/forgejo.env
+```
+Replace `yourdomain.com` in all three `FORGEJO__server__*` vars. Set `USER_UID` and `USER_GID` to match your user — run `id` to check.
+
+#### 5. Build the custom Caddy binary
 
 Caddy needs a DNS provider plugin compiled in for the DNS challenge. This repo uses Porkbun — replace `caddy-dns/porkbun` with your provider if different. Full list: https://caddyserver.com/docs/modules/dns.providers
 
 ```bash
-sudo apt install golang -y
+# Ubuntu 22.04's apt golang is too old for xcaddy — install via snap instead
+sudo snap install go --classic
+
 go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
+export PATH=$PATH:$(go env GOPATH)/bin
+echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> ~/.bashrc
 
 # Replace caddy-dns/porkbun with your DNS provider's plugin
+# This takes a few minutes on first run
 xcaddy build \
   --with github.com/caddy-dns/porkbun \
   --output /opt/homelab/caddy/caddy
@@ -154,27 +177,46 @@ EOF
 
 If you switch providers, also update the `(dns_tls)` snippet in `infra/docker/config/caddy/Caddyfile` and the corresponding env vars in `caddy.env`.
 
-#### 5. Trim the Caddyfile
+#### 6. Trim the Caddyfile
 
-Remove entries for stacks you won't be deploying. Caddy issues TLS certs for every subdomain in the file, so only keep what you'll actually use:
+Caddy issues TLS certs for every subdomain defined. Remove blocks for stacks you won't deploy — each block is labelled with its stack in a comment:
 
 ```bash
 nano infra/docker/config/caddy/Caddyfile
 ```
 
-#### 6. Deploy core
+Keep the `(dns_tls)` snippet and all `# stack: core` blocks. Remove anything else you don't need.
+
+#### 7. Deploy core
 
 ```bash
 REPO_ROOT=/opt/homelab/repo /opt/homelab/repo/infra/scripts/deploy-stack.sh core
 ```
 
-#### 7. Configure AdGuard
+#### 8. Configure AdGuard
 
-In the AdGuard UI (`http://server-lan-ip:3002`):
+Ubuntu's `systemd-resolved` holds port 53 by default, which blocks AdGuard from binding. Fix it first:
+
+```bash
+echo "DNSStubListener=no" | sudo tee -a /etc/systemd/resolved.conf
+sudo systemctl restart systemd-resolved
+```
+
+Then open the AdGuard UI at `http://server-lan-ip:3002`:
 - **Filters → DNS rewrites**: `*.yourdomain.com` → server LAN IP
 - **Settings → DNS settings**: upstream DNS set to `https://dns.cloudflare.com/dns-query`
 
 Point your router's DHCP DNS server at the server's LAN IP.
+
+#### 9. Set up the Forgejo Actions runner
+
+CI/CD requires a runner registered against your Forgejo instance. After Forgejo is up:
+
+1. Create an admin account at `https://forgejo.yourdomain.com`
+2. Go to **Site Administration → Actions → Runners** and create a new runner token
+3. Install and register the runner on the server — see [Forgejo runner docs](https://forgejo.org/docs/latest/admin/actions/)
+
+Until the runner is registered, pushes to `main` won't trigger deploys. You can still deploy manually with `deploy-stack.sh`.
 
 ---
 

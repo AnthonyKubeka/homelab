@@ -12,36 +12,19 @@
 	}
 }
 
+# stack: core
 adguard.{$HOMELAB_DOMAIN} {
 	import dns_tls
 	reverse_proxy 127.0.0.1:3002
 }
 
-homepage.{$HOMELAB_DOMAIN} {
+# stack: core
+forgejo.{$HOMELAB_DOMAIN} {
 	import dns_tls
-	reverse_proxy 127.0.0.1:3003
+	reverse_proxy 127.0.0.1:3000
 }
 
-calibre.{$HOMELAB_DOMAIN} {
-	import dns_tls
-	reverse_proxy 127.0.0.1:8093
-}
-
-calibreui.{$HOMELAB_DOMAIN} {
-	import dns_tls
-	reverse_proxy 127.0.0.1:8092
-}
-
-prometheus.{$HOMELAB_DOMAIN} {
-	import dns_tls
-	reverse_proxy 127.0.0.1:9090
-}
-
-grafana.{$HOMELAB_DOMAIN} {
-	import dns_tls
-	reverse_proxy 127.0.0.1:3001
-}
-
+# stack: core
 portainer.{$HOMELAB_DOMAIN} {
 	import dns_tls
 	reverse_proxy 127.0.0.1:9443 {
@@ -51,52 +34,80 @@ portainer.{$HOMELAB_DOMAIN} {
 	}
 }
 
-forgejo.{$HOMELAB_DOMAIN} {
+# stack: observability
+homepage.{$HOMELAB_DOMAIN} {
 	import dns_tls
-	reverse_proxy 127.0.0.1:3000
+	reverse_proxy 127.0.0.1:3003
 }
 
-homeassistant.{$HOMELAB_DOMAIN} {
+# stack: observability
+prometheus.{$HOMELAB_DOMAIN} {
 	import dns_tls
-	reverse_proxy 127.0.0.1:8123
+	reverse_proxy 127.0.0.1:9090
 }
 
-qbittorrent.{$HOMELAB_DOMAIN} {
+# stack: observability
+grafana.{$HOMELAB_DOMAIN} {
 	import dns_tls
-	reverse_proxy 127.0.0.1:8080
+	reverse_proxy 127.0.0.1:3001
 }
 
-radarr.{$HOMELAB_DOMAIN} {
+# stack: apps
+calibre.{$HOMELAB_DOMAIN} {
 	import dns_tls
-	reverse_proxy 127.0.0.1:7878
+	reverse_proxy 127.0.0.1:8093
 }
 
-sonarr.{$HOMELAB_DOMAIN} {
+# stack: apps
+calibreui.{$HOMELAB_DOMAIN} {
 	import dns_tls
-	reverse_proxy 127.0.0.1:8989
+	reverse_proxy 127.0.0.1:8092
 }
 
-prowlarr.{$HOMELAB_DOMAIN} {
-	import dns_tls
-	reverse_proxy 127.0.0.1:9696
-}
-
-flaresolverr.{$HOMELAB_DOMAIN} {
-	import dns_tls
-	reverse_proxy 127.0.0.1:8191
-}
-
+# stack: apps
 filebrowser.{$HOMELAB_DOMAIN} {
 	import dns_tls
 	reverse_proxy 127.0.0.1:8081
 }
 
+# stack: home
+homeassistant.{$HOMELAB_DOMAIN} {
+	import dns_tls
+	reverse_proxy 127.0.0.1:8123
+}
+
+# stack: media
+qbittorrent.{$HOMELAB_DOMAIN} {
+	import dns_tls
+	reverse_proxy 127.0.0.1:8080
+}
+
+# stack: media
+radarr.{$HOMELAB_DOMAIN} {
+	import dns_tls
+	reverse_proxy 127.0.0.1:7878
+}
+
+# stack: media
+sonarr.{$HOMELAB_DOMAIN} {
+	import dns_tls
+	reverse_proxy 127.0.0.1:8989
+}
+
+# stack: media
+prowlarr.{$HOMELAB_DOMAIN} {
+	import dns_tls
+	reverse_proxy 127.0.0.1:9696
+}
+
+# stack: media
+flaresolverr.{$HOMELAB_DOMAIN} {
+	import dns_tls
+	reverse_proxy 127.0.0.1:8191
+}
+
+# stack: media
 plex.{$HOMELAB_DOMAIN} {
 	import dns_tls
 	reverse_proxy 127.0.0.1:32400
-}
-
-stash.{$HOMELAB_DOMAIN} {
-	import dns_tls
-	reverse_proxy 127.0.0.1:11111
 }

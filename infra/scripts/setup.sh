@@ -34,7 +34,7 @@ copy_secret() {
   fi
 }
 
-copy_secret "$REPO_ROOT/infra/secrets/examples/core/caddy.env.exampe"             /opt/homelab/secrets/core/caddy.env
+copy_secret "$REPO_ROOT/infra/secrets/examples/core/caddy.env.example"            /opt/homelab/secrets/core/caddy.env
 copy_secret "$REPO_ROOT/infra/secrets/examples/core/forgejo.env.example"           /opt/homelab/secrets/core/forgejo.env
 copy_secret "$REPO_ROOT/infra/secrets/examples/observability/grafana.env.example"  /opt/homelab/secrets/observability/grafana.env
 
