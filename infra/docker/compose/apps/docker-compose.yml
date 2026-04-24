@@ -1,17 +1,4 @@
 services:
-  grocy:
-    image: linuxserver/grocy
-    container_name: grocy
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Africa/Johannesburg
-    volumes:
-      - /opt/homelab/data/grocy/config:/config
-    ports:
-      - "9283:80"
-    restart: unless-stopped
-
   calibre:
     image: lscr.io/linuxserver/calibre:latest
     container_name: calibre
@@ -29,19 +16,6 @@ services:
     shm_size: "1gb"
     restart: unless-stopped
 
-  koreader-sync:
-    image: koreader/kosync:latest
-    container_name: koreader-sync
-    restart: unless-stopped
-    environment:
-      - TZ=Africa/Johannesburg
-    volumes:
-      - /opt/homelab/data/koreader-sync/logs/app:/app/koreader-sync-server/logs
-      - /opt/homelab/data/koreader-sync/logs/redis:/var/log/redis
-      - /opt/homelab/data/koreader-sync/redis:/var/lib/redis
-    ports:
-      - "8095:7200"
-
   filebrowser:
     image: filebrowser/filebrowser:latest
     container_name: filebrowser
@@ -55,66 +29,3 @@ services:
       - PUID=1000
       - PGID=1000
     restart: unless-stopped
-
-  firefly_iii_core:
-    image: fireflyiii/core:latest
-    hostname: app
-    container_name: firefly_iii_core
-    restart: always
-    volumes:
-      - /opt/homelab/data/firefly/upload:/var/www/html/storage/upload
-    env_file:
-      - /opt/homelab/secrets/apps/firefly.env
-    networks:
-      - firefly_net
-    ports:
-      - "8088:8080"
-    depends_on:
-      - firefly_iii_db
-
-  firefly_iii_db:
-    image: mariadb:lts
-    hostname: db
-    container_name: firefly_iii_db
-    restart: always
-    env_file:
-      - /opt/homelab/secrets/apps/firefly-db.env
-    networks:
-      - firefly_net
-    volumes:
-      - /opt/homelab/data/firefly/db:/var/lib/mysql
-
-  firefly_iii_importer:
-    image: fireflyiii/data-importer:latest
-    hostname: importer
-    restart: always
-    container_name: firefly_iii_importer
-    networks:
-      - firefly_net
-    ports:
-      - "81:8080"
-    depends_on:
-      - firefly_iii_core
-    env_file:
-      - /opt/homelab/secrets/apps/firefly-importer.env
-
-  firefly_iii_cron:
-    image: alpine
-    restart: always
-    container_name: firefly_iii_cron
-    env_file:
-      - /opt/homelab/secrets/apps/firefly.env
-    command: >
-      sh -c '
-      apk add tzdata &&
-      ln -sf /usr/share/zoneinfo/$TZ /etc/localtime &&
-      echo "0 3 * * * wget -qO- http://firefly_iii_core:8080/api/v1/cron/$STATIC_CRON_TOKEN; echo" | crontab - &&
-      crond -f -L /dev/stdout
-      '
-    networks:
-      - firefly_net
-
-networks:
-  firefly_net:
-    external: true
-    name: firefly_net

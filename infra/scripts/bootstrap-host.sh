@@ -18,7 +18,6 @@ require_dir /opt/homelab/data
 # Secrets
 require_dir /opt/homelab/secrets/core
 require_dir /opt/homelab/secrets/observability
-require_dir /opt/homelab/secrets/apps
 
 # Core
 require_dir /opt/homelab/data/caddy/data
@@ -31,15 +30,9 @@ require_dir /opt/homelab/data/forgejo
 require_dir /opt/homelab/data/homepage
 
 # Apps
-require_dir /opt/homelab/data/grocy/config
 require_dir /opt/homelab/data/calibre/config
-require_dir /opt/homelab/data/koreader-sync/redis
-require_dir /opt/homelab/data/koreader-sync/logs/app
-require_dir /opt/homelab/data/koreader-sync/logs/redis
 require_dir /opt/homelab/data/filebrowser/config
 require_dir /opt/homelab/data/filebrowser/db
-require_dir /opt/homelab/data/firefly/upload
-require_dir /opt/homelab/data/firefly/db
 
 # Media
 require_dir /opt/homelab/data/plex/config

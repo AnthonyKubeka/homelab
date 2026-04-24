@@ -52,11 +52,6 @@ forgejo.{$HOMELAB_DOMAIN} {
 	reverse_proxy 127.0.0.1:3000
 }
 
-e-sync.{$HOMELAB_DOMAIN} {
-	import porkbun_tls
-	reverse_proxy 127.0.0.1:8095
-}
-
 homeassistant.{$HOMELAB_DOMAIN} {
 	import porkbun_tls
 	reverse_proxy 127.0.0.1:8123
@@ -87,19 +82,9 @@ flaresolverr.{$HOMELAB_DOMAIN} {
 	reverse_proxy 127.0.0.1:8191
 }
 
-grocy.{$HOMELAB_DOMAIN} {
-	import porkbun_tls
-	reverse_proxy 127.0.0.1:9283
-}
-
 filebrowser.{$HOMELAB_DOMAIN} {
 	import porkbun_tls
 	reverse_proxy 127.0.0.1:8081
-}
-
-firefly.{$HOMELAB_DOMAIN} {
-	import porkbun_tls
-	reverse_proxy 127.0.0.1:8088
 }
 
 plex.{$HOMELAB_DOMAIN} {

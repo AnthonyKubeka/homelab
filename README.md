@@ -29,7 +29,7 @@ flowchart LR
 |-------|----------|
 | `core` | Caddy (reverse proxy + TLS), AdGuard Home (DNS), Forgejo, Portainer |
 | `media` | Plex, qBittorrent, Radarr, Sonarr, Prowlarr, FlareSolverr |
-| `apps` | Grocy, Calibre, FileBrowser, Firefly III, Koreader Sync |
+| `apps` | Calibre, FileBrowser |
 | `home` | Home Assistant, Matter Server |
 | `observability` | Prometheus, Grafana, Node Exporter, cAdvisor, Homepage |
 
@@ -49,10 +49,8 @@ graph TD
         Prowlarr
     end
     subgraph apps
-        Grocy
         Calibre
         FileBrowser
-        Firefly
     end
     subgraph home
         HomeAssistant

@@ -15,22 +15,15 @@ echo "Creating directories..."
 sudo mkdir -p \
   /opt/homelab/secrets/core \
   /opt/homelab/secrets/observability \
-  /opt/homelab/secrets/apps \
   /opt/homelab/data/caddy/data \
   /opt/homelab/data/caddy/config \
   /opt/homelab/data/adguard/work \
   /opt/homelab/data/adguard/conf \
   /opt/homelab/data/forgejo \
   /opt/homelab/data/homepage \
-  /opt/homelab/data/grocy/config \
   /opt/homelab/data/calibre/config \
-  /opt/homelab/data/koreader-sync/redis \
-  /opt/homelab/data/koreader-sync/logs/app \
-  /opt/homelab/data/koreader-sync/logs/redis \
   /opt/homelab/data/filebrowser/config \
   /opt/homelab/data/filebrowser/db \
-  /opt/homelab/data/firefly/upload \
-  /opt/homelab/data/firefly/db \
   /opt/homelab/data/plex/config \
   /opt/homelab/data/plex/transcode \
   /opt/homelab/data/qbittorrent/config \
@@ -58,22 +51,16 @@ copy_secret() {
   fi
 }
 
-copy_secret "$REPO_ROOT/infra/secrets/examples/core/caddy.env.exampe"           /opt/homelab/secrets/core/caddy.env
-copy_secret "$REPO_ROOT/infra/secrets/examples/core/forgejo.env.example"         /opt/homelab/secrets/core/forgejo.env
-copy_secret "$REPO_ROOT/infra/secrets/examples/observability/grafana.env.example" /opt/homelab/secrets/observability/grafana.env
-copy_secret "$REPO_ROOT/infra/secrets/examples/apps/firefly.env.example"          /opt/homelab/secrets/apps/firefly.env
-copy_secret "$REPO_ROOT/infra/secrets/examples/apps/firefly-db.env.example"       /opt/homelab/secrets/apps/firefly-db.env
-copy_secret "$REPO_ROOT/infra/secrets/examples/apps/firefly-importer.env.example" /opt/homelab/secrets/apps/firefly-importer.env
+copy_secret "$REPO_ROOT/infra/secrets/examples/core/caddy.env.exampe"             /opt/homelab/secrets/core/caddy.env
+copy_secret "$REPO_ROOT/infra/secrets/examples/core/forgejo.env.example"           /opt/homelab/secrets/core/forgejo.env
+copy_secret "$REPO_ROOT/infra/secrets/examples/observability/grafana.env.example"  /opt/homelab/secrets/observability/grafana.env
 
 echo ""
 echo "Setup complete. Fill in your secrets before deploying:"
 echo ""
-echo "  /opt/homelab/secrets/core/caddy.env          — Porkbun API keys + HOMELAB_DOMAIN"
-echo "  /opt/homelab/secrets/core/forgejo.env         — Forgejo config"
+echo "  /opt/homelab/secrets/core/caddy.env           — Porkbun API keys + HOMELAB_DOMAIN"
+echo "  /opt/homelab/secrets/core/forgejo.env          — Forgejo config"
 echo "  /opt/homelab/secrets/observability/grafana.env — Grafana admin password"
-echo "  /opt/homelab/secrets/apps/firefly.env          — Firefly III app config"
-echo "  /opt/homelab/secrets/apps/firefly-db.env       — Firefly III DB credentials"
-echo "  /opt/homelab/secrets/apps/firefly-importer.env — Firefly III importer config"
 echo ""
 echo "Also configure your media mount points in:"
 echo "  infra/docker/compose/media/docker-compose.yml  — /mnt/media, /mnt/torrents"

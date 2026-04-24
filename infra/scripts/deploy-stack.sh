@@ -39,9 +39,6 @@ case "$STACK_NAME" in
     require_secret /opt/homelab/secrets/observability/grafana.env
     ;;
   apps)
-    require_secret /opt/homelab/secrets/apps/firefly.env
-    require_secret /opt/homelab/secrets/apps/firefly-db.env
-    require_secret /opt/homelab/secrets/apps/firefly-importer.env
     ;;
 esac
 
