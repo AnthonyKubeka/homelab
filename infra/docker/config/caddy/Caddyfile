@@ -1,5 +1,9 @@
 
-(porkbun_tls) {
+# DNS challenge TLS — using Porkbun here, but any provider works.
+# Replace the block below with your provider's Caddy DNS plugin syntax.
+# Full list: https://caddyserver.com/docs/modules/dns.providers
+# Build xcaddy with your chosen plugin: --with github.com/caddy-dns/<provider>
+(dns_tls) {
 	tls {
 		dns porkbun {
 			api_key {$PORKBUN_API_KEY}
@@ -9,37 +13,37 @@
 }
 
 adguard.{$HOMELAB_DOMAIN} {
-	import porkbun_tls
+	import dns_tls
 	reverse_proxy 127.0.0.1:3002
 }
 
 homepage.{$HOMELAB_DOMAIN} {
-	import porkbun_tls
+	import dns_tls
 	reverse_proxy 127.0.0.1:3003
 }
 
 calibre.{$HOMELAB_DOMAIN} {
-	import porkbun_tls
+	import dns_tls
 	reverse_proxy 127.0.0.1:8093
 }
 
 calibreui.{$HOMELAB_DOMAIN} {
-	import porkbun_tls
+	import dns_tls
 	reverse_proxy 127.0.0.1:8092
 }
 
 prometheus.{$HOMELAB_DOMAIN} {
-	import porkbun_tls
+	import dns_tls
 	reverse_proxy 127.0.0.1:9090
 }
 
 grafana.{$HOMELAB_DOMAIN} {
-	import porkbun_tls
+	import dns_tls
 	reverse_proxy 127.0.0.1:3001
 }
 
 portainer.{$HOMELAB_DOMAIN} {
-	import porkbun_tls
+	import dns_tls
 	reverse_proxy 127.0.0.1:9443 {
 		transport http {
 			tls_insecure_skip_verify
@@ -48,51 +52,51 @@ portainer.{$HOMELAB_DOMAIN} {
 }
 
 forgejo.{$HOMELAB_DOMAIN} {
-	import porkbun_tls
+	import dns_tls
 	reverse_proxy 127.0.0.1:3000
 }
 
 homeassistant.{$HOMELAB_DOMAIN} {
-	import porkbun_tls
+	import dns_tls
 	reverse_proxy 127.0.0.1:8123
 }
 
 qbittorrent.{$HOMELAB_DOMAIN} {
-	import porkbun_tls
+	import dns_tls
 	reverse_proxy 127.0.0.1:8080
 }
 
 radarr.{$HOMELAB_DOMAIN} {
-	import porkbun_tls
+	import dns_tls
 	reverse_proxy 127.0.0.1:7878
 }
 
 sonarr.{$HOMELAB_DOMAIN} {
-	import porkbun_tls
+	import dns_tls
 	reverse_proxy 127.0.0.1:8989
 }
 
 prowlarr.{$HOMELAB_DOMAIN} {
-	import porkbun_tls
+	import dns_tls
 	reverse_proxy 127.0.0.1:9696
 }
 
 flaresolverr.{$HOMELAB_DOMAIN} {
-	import porkbun_tls
+	import dns_tls
 	reverse_proxy 127.0.0.1:8191
 }
 
 filebrowser.{$HOMELAB_DOMAIN} {
-	import porkbun_tls
+	import dns_tls
 	reverse_proxy 127.0.0.1:8081
 }
 
 plex.{$HOMELAB_DOMAIN} {
-	import porkbun_tls
+	import dns_tls
 	reverse_proxy 127.0.0.1:32400
 }
 
 stash.{$HOMELAB_DOMAIN} {
-	import porkbun_tls
+	import dns_tls
 	reverse_proxy 127.0.0.1:11111
 }

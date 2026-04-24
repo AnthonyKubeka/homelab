@@ -72,7 +72,7 @@ graph TD
 ## Architecture highlights
 
 ### Reverse proxy + TLS
-Caddy runs with `network_mode: host` and handles TLS for all subdomains via the **Porkbun DNS challenge** (custom-built Caddy binary with the `caddy-dns/porkbun` plugin). No ports are exposed to the internet — TLS certs are issued entirely via DNS. The domain is set once as `HOMELAB_DOMAIN=yourdomain.com` in `caddy.env` and referenced everywhere in the Caddyfile as `{$HOMELAB_DOMAIN}`.
+Caddy runs with `network_mode: host` and handles TLS for all subdomains via a **DNS challenge** (custom-built Caddy binary with a `caddy-dns/<provider>` plugin). No ports are exposed to the internet — TLS certs are issued entirely via DNS. The domain is set once as `HOMELAB_DOMAIN=yourdomain.com` in `caddy.env` and referenced everywhere in the Caddyfile as `{$HOMELAB_DOMAIN}`. The repo uses Porkbun as the DNS provider but any provider with a Caddy plugin works.
 
 ### DNS: split-horizon with AdGuard + Tailscale
 
@@ -133,10 +133,13 @@ nano /opt/homelab/secrets/core/forgejo.env  # update domain references
 
 #### 4. Build the custom Caddy binary
 
+Caddy needs a DNS provider plugin compiled in for the DNS challenge. This repo uses Porkbun — replace `caddy-dns/porkbun` with your provider if different. Full list: https://caddyserver.com/docs/modules/dns.providers
+
 ```bash
 sudo apt install golang -y
 go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
 
+# Replace caddy-dns/porkbun with your DNS provider's plugin
 xcaddy build \
   --with github.com/caddy-dns/porkbun \
   --output /opt/homelab/caddy/caddy
@@ -148,6 +151,8 @@ COPY caddy /usr/bin/caddy
 ENTRYPOINT ["/usr/bin/caddy"]
 EOF
 ```
+
+If you switch providers, also update the `(dns_tls)` snippet in `infra/docker/config/caddy/Caddyfile` and the corresponding env vars in `caddy.env`.
 
 #### 5. Trim the Caddyfile
 
