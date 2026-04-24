@@ -1,5 +1,4 @@
 
-
 (porkbun_tls) {
 	tls {
 		dns porkbun {
@@ -9,42 +8,37 @@
 	}
 }
 
-adguard.anthonykubeka.com {
+adguard.{$HOMELAB_DOMAIN} {
 	import porkbun_tls
 	reverse_proxy 127.0.0.1:3002
 }
 
-homepage.anthonykubeka.com {
+homepage.{$HOMELAB_DOMAIN} {
 	import porkbun_tls
 	reverse_proxy 127.0.0.1:3003
 }
 
-calibre.anthonykubeka.com {
+calibre.{$HOMELAB_DOMAIN} {
 	import porkbun_tls
 	reverse_proxy 127.0.0.1:8093
 }
 
-prometheus.anthonykubeka.com {
-	import porkbun_tls
-	reverse_proxy 127.0.0.1:9090
-}
-
-grafana.anthonykubeka.com {
-	import porkbun_tls
-	reverse_proxy 127.0.0.1:3001
-}
-
-xbvr.anthonykubeka.com {
-	import porkbun_tls
-	reverse_proxy 127.0.0.1:9999
-}
-
-calibreui.anthonykubeka.com {
+calibreui.{$HOMELAB_DOMAIN} {
 	import porkbun_tls
 	reverse_proxy 127.0.0.1:8092
 }
 
-portainer.anthonykubeka.com {
+prometheus.{$HOMELAB_DOMAIN} {
+	import porkbun_tls
+	reverse_proxy 127.0.0.1:9090
+}
+
+grafana.{$HOMELAB_DOMAIN} {
+	import porkbun_tls
+	reverse_proxy 127.0.0.1:3001
+}
+
+portainer.{$HOMELAB_DOMAIN} {
 	import porkbun_tls
 	reverse_proxy 127.0.0.1:9443 {
 		transport http {
@@ -53,67 +47,67 @@ portainer.anthonykubeka.com {
 	}
 }
 
-forgejo.anthonykubeka.com {
+forgejo.{$HOMELAB_DOMAIN} {
 	import porkbun_tls
 	reverse_proxy 127.0.0.1:3000
 }
 
-e-sync.anthonykubeka.com {
+e-sync.{$HOMELAB_DOMAIN} {
 	import porkbun_tls
 	reverse_proxy 127.0.0.1:8095
 }
 
-homeassistant.anthonykubeka.com {
+homeassistant.{$HOMELAB_DOMAIN} {
 	import porkbun_tls
 	reverse_proxy 127.0.0.1:8123
 }
 
-qbittorrent.anthonykubeka.com {
+qbittorrent.{$HOMELAB_DOMAIN} {
 	import porkbun_tls
 	reverse_proxy 127.0.0.1:8080
 }
 
-radarr.anthonykubeka.com {
+radarr.{$HOMELAB_DOMAIN} {
 	import porkbun_tls
 	reverse_proxy 127.0.0.1:7878
 }
 
-sonarr.anthonykubeka.com {
+sonarr.{$HOMELAB_DOMAIN} {
 	import porkbun_tls
 	reverse_proxy 127.0.0.1:8989
 }
 
-prowlarr.anthonykubeka.com {
+prowlarr.{$HOMELAB_DOMAIN} {
 	import porkbun_tls
 	reverse_proxy 127.0.0.1:9696
 }
 
-flaresolverr.anthonykubeka.com {
+flaresolverr.{$HOMELAB_DOMAIN} {
 	import porkbun_tls
 	reverse_proxy 127.0.0.1:8191
 }
 
-grocy.anthonykubeka.com {
+grocy.{$HOMELAB_DOMAIN} {
 	import porkbun_tls
 	reverse_proxy 127.0.0.1:9283
 }
 
-filebrowser.anthonykubeka.com {
+filebrowser.{$HOMELAB_DOMAIN} {
 	import porkbun_tls
 	reverse_proxy 127.0.0.1:8081
 }
 
-firefly.anthonykubeka.com {
+firefly.{$HOMELAB_DOMAIN} {
 	import porkbun_tls
 	reverse_proxy 127.0.0.1:8088
 }
 
-plex.anthonykubeka.com {
+plex.{$HOMELAB_DOMAIN} {
 	import porkbun_tls
 	reverse_proxy 127.0.0.1:32400
 }
 
-stash.anthonykubeka.com {
+stash.{$HOMELAB_DOMAIN} {
 	import porkbun_tls
 	reverse_proxy 127.0.0.1:11111
 }

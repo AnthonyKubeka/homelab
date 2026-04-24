@@ -15,10 +15,9 @@ services:
               count: all
               capabilities: [gpu]
     volumes:
-      - /home/commander-shepard/plex-config:/config
-      - /home/commander-shepard/media:/media
-      - /home/commander-shepard/plex-transcode:/transcode
-      - /home/commander-shepard/plex-transcode:/run/plex-temp
+      - /opt/homelab/data/plex/config:/config
+      - /opt/homelab/data/plex/transcode:/transcode
+      - /mnt/media:/media          # point this at your media drive
     restart: unless-stopped
     runtime: nvidia
 
@@ -35,13 +34,10 @@ services:
       - UMASK=002
       - WEBUI_PORT=8080
     volumes:
-      - /home/commander-shepard/nrt/torrents:/torrents
-      - /home/commander-shepard/nrt/incomplete-torrents:/incomplete-torrents
-      - /home/commander-shepard/vr/vr-films:/vr/vr-films
-      - /home/commander-shepard/professional/vr-films-2:/vr/vr-films-2
-      - /home/commander-shepard/media:/media
-      - /home/commander-shepard/qbittorrent-config:/config
-      - /home/commander-shepard/professional:/professional
+      - /opt/homelab/data/qbittorrent/config:/config
+      - /mnt/torrents:/torrents              # completed downloads
+      - /mnt/torrents/incomplete:/incomplete  # in-progress downloads
+      - /mnt/media:/media                    # point this at your media drive
     restart: unless-stopped
 
   radarr:
@@ -54,9 +50,9 @@ services:
       - PGID=1000
       - UMASK=002
     volumes:
-      - /home/commander-shepard/media/movies:/movies
-      - /home/commander-shepard/nrt/torrents:/torrents
-      - /home/commander-shepard/radarr-config:/config
+      - /opt/homelab/data/radarr/config:/config
+      - /mnt/media/movies:/movies
+      - /mnt/torrents:/torrents
     restart: unless-stopped
 
   sonarr:
@@ -69,10 +65,9 @@ services:
       - PGID=1000
       - UMASK=002
     volumes:
-      - /home/commander-shepard/media/animated-series:/animated-series
-      - /home/commander-shepard/media/series:/series
-      - /home/commander-shepard/nrt/torrents:/torrents
-      - /home/commander-shepard/sonarr-config:/config
+      - /opt/homelab/data/sonarr/config:/config
+      - /mnt/media/series:/series
+      - /mnt/torrents:/torrents
     restart: unless-stopped
 
   prowlarr:
@@ -85,7 +80,7 @@ services:
       - PGID=1000
       - UMASK=002
     volumes:
-      - /home/commander-shepard/prowlarr-config:/config
+      - /opt/homelab/data/prowlarr/config:/config
     restart: unless-stopped
 
   flaresolverr:

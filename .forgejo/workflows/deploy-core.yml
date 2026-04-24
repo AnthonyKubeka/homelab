@@ -11,7 +11,7 @@ on:
       - '.forgejo/workflows/deploy-core.yml'
 
 env:
-  REPO_ROOT: /home/commander-shepard/homelab
+  REPO_ROOT: /opt/homelab/repo
 
 jobs:
   deploy:

@@ -40,7 +40,7 @@ adaptive_lighting:
       - light.guest_bathroom_light
 
 homeassistant:
-  external_url: https://homeassistant.anthonykubeka.com
+  external_url: https://homeassistant.yourdomain.com
   internal_url: http://127.0.0.1:8123
 
 http:

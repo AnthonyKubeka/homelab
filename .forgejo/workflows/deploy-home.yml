@@ -10,7 +10,7 @@ on:
       - '.forgejo/workflows/deploy-home.yml'
 
 env:
-  REPO_ROOT: /home/commander-shepard/homelab
+  REPO_ROOT: /opt/homelab/repo
 
 jobs:
   deploy:
@@ -24,11 +24,11 @@ jobs:
 
       - name: Sync Home Assistant config
         run: |
-          mkdir -p /home/commander-shepard/homeassistant/config
+          mkdir -p /opt/homelab/data/homeassistant/config
           rsync -av \
             --exclude 'secrets.yaml' \
             $REPO_ROOT/infra/docker/config/homeassistant/ \
-            /home/commander-shepard/homeassistant/config/
+            /opt/homelab/data/homeassistant/config/
 
       - name: Deploy home stack
         run: $REPO_ROOT/infra/scripts/deploy-stack.sh home

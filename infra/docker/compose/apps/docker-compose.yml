@@ -7,7 +7,7 @@ services:
       - PGID=1000
       - TZ=Africa/Johannesburg
     volumes:
-      - /home/commander-shepard/grocy/config:/config
+      - /opt/homelab/data/grocy/config:/config
     ports:
       - "9283:80"
     restart: unless-stopped
@@ -20,8 +20,8 @@ services:
       - PGID=1000
       - TZ=Africa/Johannesburg
     volumes:
-      - /home/commander-shepard/calibre-config:/config
-      - /home/commander-shepard/library:/library
+      - /opt/homelab/data/calibre/config:/config
+      - /mnt/media/books:/library    # point this at your books directory
     ports:
       - "8092:8080"
       - "8185:8181"
@@ -36,9 +36,9 @@ services:
     environment:
       - TZ=Africa/Johannesburg
     volumes:
-      - /home/commander-shepard/docker/logs/app:/app/koreader-sync-server/logs
-      - /home/commander-shepard/docker/logs/redis:/var/log/redis
-      - /home/commander-shepard/docker/data/redis:/var/lib/redis
+      - /opt/homelab/data/koreader-sync/logs/app:/app/koreader-sync-server/logs
+      - /opt/homelab/data/koreader-sync/logs/redis:/var/log/redis
+      - /opt/homelab/data/koreader-sync/redis:/var/lib/redis
     ports:
       - "8095:7200"
 
@@ -49,8 +49,8 @@ services:
       - "8081:80"
     volumes:
       - /:/srv
-      - /home/commander-shepard/filebrowser-config:/config
-      - /home/commander-shepard/filebrowser-db:/database
+      - /opt/homelab/data/filebrowser/config:/config
+      - /opt/homelab/data/filebrowser/db:/database
     environment:
       - PUID=1000
       - PGID=1000
@@ -62,7 +62,7 @@ services:
     container_name: firefly_iii_core
     restart: always
     volumes:
-      - /home/commander-shepard/firefly-config/upload:/var/www/html/storage/upload
+      - /opt/homelab/data/firefly/upload:/var/www/html/storage/upload
     env_file:
       - /opt/homelab/secrets/apps/firefly.env
     networks:
@@ -82,7 +82,7 @@ services:
     networks:
       - firefly_net
     volumes:
-      - /home/commander-shepard/firefly-db:/var/lib/mysql
+      - /opt/homelab/data/firefly/db:/var/lib/mysql
 
   firefly_iii_importer:
     image: fireflyiii/data-importer:latest

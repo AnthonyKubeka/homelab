@@ -3,13 +3,14 @@ services:
     container_name: homeassistant
     image: ghcr.io/home-assistant/home-assistant:stable
     volumes:
-      - /home/commander-shepard/homeassistant/config:/config
+      - /opt/homelab/data/homeassistant/config:/config
       - /etc/localtime:/etc/localtime:ro
       - /run/dbus:/run/dbus:ro
     restart: unless-stopped
     privileged: true
     network_mode: host
     devices:
+      # Update this to match your Zigbee dongle's device ID
       - /dev/serial/by-id/usb-Itead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_V2_c0809eb067f3ef119ffac61b6d9880ab-if00-port0:/dev/ttyZigbee
     environment:
       TZ: Africa/Johannesburg
@@ -22,6 +23,6 @@ services:
     security_opt:
       - apparmor:unconfined
     volumes:
-      - /home/commander-shepard/homeassistant/matter-server:/data
+      - /opt/homelab/data/homeassistant/matter-server:/data
     environment:
       TZ: Africa/Johannesburg
