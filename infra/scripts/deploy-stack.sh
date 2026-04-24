@@ -22,6 +22,13 @@ echo "Repo root: $REPO_ROOT"
 
 bash "$REPO_ROOT/infra/scripts/bootstrap-host.sh"
 
+require_dir() {
+  local path="$1"
+  if [[ ! -d "$path" ]]; then
+    sudo mkdir -p "$path"
+  fi
+}
+
 require_secret() {
   local path="$1"
   if [[ ! -f "$path" ]]; then
@@ -32,13 +39,36 @@ require_secret() {
 
 case "$STACK_NAME" in
   core)
+    require_dir /opt/homelab/secrets/core
+    require_dir /opt/homelab/data/caddy/data
+    require_dir /opt/homelab/data/caddy/config
+    require_dir /opt/homelab/data/adguard/work
+    require_dir /opt/homelab/data/adguard/conf
+    require_dir /opt/homelab/data/forgejo
     require_secret /opt/homelab/secrets/core/caddy.env
     require_secret /opt/homelab/secrets/core/forgejo.env
     ;;
   observability)
+    require_dir /opt/homelab/secrets/observability
+    require_dir /opt/homelab/data/homepage
     require_secret /opt/homelab/secrets/observability/grafana.env
     ;;
   apps)
+    require_dir /opt/homelab/data/calibre/config
+    require_dir /opt/homelab/data/filebrowser/config
+    require_dir /opt/homelab/data/filebrowser/db
+    ;;
+  media)
+    require_dir /opt/homelab/data/plex/config
+    require_dir /opt/homelab/data/plex/transcode
+    require_dir /opt/homelab/data/qbittorrent/config
+    require_dir /opt/homelab/data/radarr/config
+    require_dir /opt/homelab/data/sonarr/config
+    require_dir /opt/homelab/data/prowlarr/config
+    ;;
+  home)
+    require_dir /opt/homelab/data/homeassistant/config
+    require_dir /opt/homelab/data/homeassistant/matter-server
     ;;
 esac
 
