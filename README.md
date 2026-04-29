@@ -169,6 +169,7 @@ cat > /opt/homelab/caddy/Dockerfile <<'EOF'
 FROM ubuntu:22.04
 COPY caddy /usr/bin/caddy
 ENTRYPOINT ["/usr/bin/caddy"]
+CMD ["run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
 EOF
 ```
 
@@ -184,20 +185,22 @@ nano infra/docker/config/caddy/Caddyfile
 
 Keep the `(dns_tls)` snippet and all `# stack: core` blocks. Remove anything else you don't need.
 
-#### 7. Deploy core
+#### 7. Free port 53 for AdGuard
 
-```bash
-REPO_ROOT=/opt/homelab/repo /opt/homelab/repo/infra/scripts/deploy-stack.sh core
-```
-
-#### 8. Configure AdGuard
-
-Ubuntu's `systemd-resolved` holds port 53 by default, which blocks AdGuard from binding. Fix it first:
+Ubuntu's `systemd-resolved` holds port 53 by default. AdGuard won't start if it can't bind that port, so fix this before deploying:
 
 ```bash
 echo "DNSStubListener=no" | sudo tee -a /etc/systemd/resolved.conf
 sudo systemctl restart systemd-resolved
 ```
+
+#### 8. Deploy core
+
+```bash
+REPO_ROOT=/opt/homelab/repo /opt/homelab/repo/infra/scripts/deploy-stack.sh core
+```
+
+#### 9. Configure AdGuard
 
 Open AdGuard **directly via its IP and port** — subdomain access (`adguard.yourdomain.com`) won't work yet because that goes through Caddy, and Caddy won't have TLS certs until DNS records are set up in the next step.
 
@@ -211,7 +214,7 @@ In the AdGuard UI:
 
 Point your router's DHCP DNS server at the server's LAN IP.
 
-#### 9. Set up DNS records in Porkbun
+#### 10. Set up DNS records in Porkbun
 
 Add a single wildcard A record in your Porkbun DNS dashboard:
 
@@ -227,7 +230,7 @@ Caddy's TLS certificates are issued via the Porkbun API (DNS challenge) — no i
 
 Once the A record is in place and Caddy has issued certs, all your subdomains will be accessible over HTTPS.
 
-#### 10. Set up the Forgejo Actions runner
+#### 11. Set up the Forgejo Actions runner
 
 CI/CD requires a runner registered against your Forgejo instance. After Forgejo is up:
 
