@@ -11,6 +11,13 @@ echo "Homelab setup"
 echo "Repo root: $REPO_ROOT"
 echo ""
 
+read -rp "Your root domain (e.g. yourdomain.com): " HOMELAB_DOMAIN
+if [[ -z "$HOMELAB_DOMAIN" ]]; then
+  echo "Error: domain is required" >&2
+  exit 1
+fi
+echo ""
+
 echo "Creating base directories..."
 sudo mkdir -p \
   /opt/homelab/secrets/core \
@@ -39,12 +46,19 @@ copy_secret "$REPO_ROOT/infra/secrets/examples/core/forgejo.env.example"        
 copy_secret "$REPO_ROOT/infra/secrets/examples/observability/grafana.env.example"  /opt/homelab/secrets/observability/grafana.env
 
 echo ""
+echo "Substituting domain and user IDs..."
+sed -i "s|yourdomain\.com|${HOMELAB_DOMAIN}|g" /opt/homelab/secrets/core/caddy.env
+sed -i "s|yourdomain\.com|${HOMELAB_DOMAIN}|g" /opt/homelab/secrets/core/forgejo.env
+sed -i "s|^USER_UID=.*|USER_UID=$(id -u)|"      /opt/homelab/secrets/core/forgejo.env
+sed -i "s|^USER_GID=.*|USER_GID=$(id -g)|"      /opt/homelab/secrets/core/forgejo.env
+echo "Done."
+echo ""
+
 echo "Setup complete. Next steps:"
 echo ""
-echo "1. Fill in your secrets:"
-echo "   /opt/homelab/secrets/core/caddy.env           — Porkbun API keys + HOMELAB_DOMAIN"
-echo "   /opt/homelab/secrets/core/forgejo.env          — Forgejo domain config"
-echo "   /opt/homelab/secrets/observability/grafana.env — Grafana admin password (if using observability)"
+echo "1. Fill in your Porkbun API credentials:"
+echo "   /opt/homelab/secrets/core/caddy.env"
+echo "   (HOMELAB_DOMAIN is already set to $HOMELAB_DOMAIN)"
 echo ""
 echo "2. Build the custom Caddy binary into /opt/homelab/caddy/"
 echo "   See README for instructions."

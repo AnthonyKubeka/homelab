@@ -139,15 +139,12 @@ Creates the base directory structure and copies example secrets into place.
 
 #### 4. Fill in secrets
 
+`setup.sh` already wrote your domain into both secret files and set `USER_UID`/`USER_GID` to your current user. You only need to add your API credentials:
+
 ```bash
 nano /opt/homelab/secrets/core/caddy.env
 ```
-Set `PORKBUN_API_KEY`, `PORKBUN_API_SECRET`, and `HOMELAB_DOMAIN` (your root domain, e.g. `yourdomain.com`).
-
-```bash
-nano /opt/homelab/secrets/core/forgejo.env
-```
-Replace `yourdomain.com` in all three `FORGEJO__server__*` vars. Set `USER_UID` and `USER_GID` to match your user — run `id` to check.
+Set `PORKBUN_API_KEY` and `PORKBUN_API_SECRET`.
 
 #### 5. Build the custom Caddy binary
 
@@ -202,13 +199,35 @@ echo "DNSStubListener=no" | sudo tee -a /etc/systemd/resolved.conf
 sudo systemctl restart systemd-resolved
 ```
 
-Then open the AdGuard UI at `http://server-lan-ip:3002`:
+Open AdGuard **directly via its IP and port** — subdomain access (`adguard.yourdomain.com`) won't work yet because that goes through Caddy, and Caddy won't have TLS certs until DNS records are set up in the next step.
+
+```
+http://server-lan-ip:3002
+```
+
+In the AdGuard UI:
 - **Filters → DNS rewrites**: `*.yourdomain.com` → server LAN IP
 - **Settings → DNS settings**: upstream DNS set to `https://dns.cloudflare.com/dns-query`
 
 Point your router's DHCP DNS server at the server's LAN IP.
 
-#### 9. Set up the Forgejo Actions runner
+#### 9. Set up DNS records in Porkbun
+
+Add a single wildcard A record in your Porkbun DNS dashboard:
+
+| Type | Host | Answer |
+|------|------|--------|
+| A | `*.yourdomain.com` | your server's IP |
+
+**What IP to use:**
+- **Tailscale (recommended):** use the server's Tailscale IP. Install Tailscale first (see optional section below), then come back and add this record.
+- **No Tailscale:** use your server's public IP and configure port forwarding for ports 80 and 443 on your router.
+
+Caddy's TLS certificates are issued via the Porkbun API (DNS challenge) — no inbound traffic to the server is needed for cert issuance. The A record is only needed so that remote clients can reach your services.
+
+Once the A record is in place and Caddy has issued certs, all your subdomains will be accessible over HTTPS.
+
+#### 10. Set up the Forgejo Actions runner
 
 CI/CD requires a runner registered against your Forgejo instance. After Forgejo is up:
 
