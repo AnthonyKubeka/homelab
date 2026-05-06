@@ -99,200 +99,53 @@ Never committed. Live at `/opt/homelab/secrets/` on the server. Example files ar
 ## Installation
 
 ### Prerequisites
-- Ubuntu server (or any systemd-based Linux)
-- A domain with Porkbun DNS (or adapt the Caddy build for your DNS provider)
-- A Forgejo instance with an Actions runner on the server — can be self-hosted via the `core` stack itself
+- Ubuntu server (22.04+)
+- A domain managed via Porkbun DNS (or adapt for another provider — see below)
+- Git installed on the server (`sudo apt install -y git`)
 
 ---
 
-### Core (required)
-
-#### 0. Install prerequisites
+### 1. Clone the repo
 
 ```bash
-sudo apt update && sudo apt install -y git curl
-```
-
-#### 1. Install Docker
-
-```bash
-curl -fsSL https://get.docker.com | sudo sh
-sudo usermod -aG docker $USER
-newgrp docker  # activates the group for the current shell; log out and back in to make it permanent
-```
-
-#### 2. Clone the repo
-
-```bash
-sudo mkdir -p /opt/homelab && sudo chown $USER:$USER /opt/homelab
 git clone https://github.com/AnthonyKubeka/homelab.git /opt/homelab/repo
 cd /opt/homelab/repo
 ```
 
-#### 3. Run setup
+### 2. Run setup
 
 ```bash
 bash infra/scripts/setup.sh
 ```
 
-Creates the base directory structure and copies example secrets into place.
+The script is interactive and handles everything:
 
-#### 4. Fill in secrets
+- Installs Docker and prerequisites
+- Prompts for your domain, Porkbun API credentials, and which stacks to deploy
+- Configures all secret files
+- Patches compose files with your paths, timezone, and hardware config
+- Trims the Caddyfile to only the stacks you're deploying
+- Builds the custom Caddy binary (with DNS plugin)
+- Frees port 53 from `systemd-resolved` for AdGuard
+- Deploys all selected stacks
 
-`setup.sh` already wrote your domain into both secret files and set `USER_UID`/`USER_GID` to your current user. You only need to add your API credentials:
+When it finishes it prints exact instructions for the three remaining steps that require external access:
 
-```bash
-nano /opt/homelab/secrets/core/caddy.env
-```
-Set `PORKBUN_API_KEY` and `PORKBUN_API_SECRET`.
-
-#### 5. Build the custom Caddy binary
-
-Caddy needs a DNS provider plugin compiled in for the DNS challenge. This repo uses Porkbun — replace `caddy-dns/porkbun` with your provider if different. Full list: https://caddyserver.com/docs/modules/dns.providers
-
-```bash
-# Ubuntu 22.04's apt golang is too old for xcaddy — install via snap instead
-sudo snap install go --classic
-
-go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
-export PATH=$PATH:$(go env GOPATH)/bin
-echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> ~/.bashrc
-
-# Replace caddy-dns/porkbun with your DNS provider's plugin
-# This takes a few minutes on first run
-xcaddy build \
-  --with github.com/caddy-dns/porkbun \
-  --output /opt/homelab/caddy/caddy
-
-# Dockerfile so Docker Compose can build the image
-cat > /opt/homelab/caddy/Dockerfile <<'EOF'
-FROM ubuntu:22.04
-COPY caddy /usr/bin/caddy
-ENTRYPOINT ["/usr/bin/caddy"]
-CMD ["run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
-EOF
-```
-
-If you switch providers, also update the `(dns_tls)` snippet in `infra/docker/config/caddy/Caddyfile` and the corresponding env vars in `caddy.env`.
-
-#### 6. Trim the Caddyfile
-
-Caddy issues TLS certs for every subdomain defined. Remove blocks for stacks you won't deploy — each block is labelled with its stack in a comment:
-
-```bash
-nano infra/docker/config/caddy/Caddyfile
-```
-
-Keep the `(dns_tls)` snippet and all `# stack: core` blocks. Remove anything else you don't need.
-
-#### 7. Free port 53 for AdGuard
-
-Ubuntu's `systemd-resolved` holds port 53 by default. AdGuard won't start if it can't bind that port, so fix this before deploying:
-
-```bash
-echo "DNSStubListener=no" | sudo tee -a /etc/systemd/resolved.conf
-sudo systemctl restart systemd-resolved
-```
-
-#### 8. Deploy core
-
-```bash
-REPO_ROOT=/opt/homelab/repo /opt/homelab/repo/infra/scripts/deploy-stack.sh core
-```
-
-#### 9. Configure AdGuard
-
-Open AdGuard **directly via its IP and port** — subdomain access (`adguard.yourdomain.com`) won't work yet because that goes through Caddy, and Caddy won't have TLS certs until DNS records are set up in the next step.
-
-```
-http://server-lan-ip:3002
-```
-
-In the AdGuard UI:
-- **Filters → DNS rewrites**: `*.yourdomain.com` → server LAN IP
-- **Settings → DNS settings**: upstream DNS set to `https://dns.cloudflare.com/dns-query`
-
-Point your router's DHCP DNS server at the server's LAN IP.
-
-#### 10. Set up DNS records in Porkbun
-
-Add a single wildcard A record in your Porkbun DNS dashboard:
-
-| Type | Host | Answer |
-|------|------|--------|
-| A | `*.yourdomain.com` | your server's IP |
-
-**What IP to use:**
-- **Tailscale (recommended):** use the server's Tailscale IP. Install Tailscale first (see optional section below), then come back and add this record.
-- **No Tailscale:** use your server's public IP and configure port forwarding for ports 80 and 443 on your router.
-
-Caddy's TLS certificates are issued via the Porkbun API (DNS challenge) — no inbound traffic to the server is needed for cert issuance. The A record is only needed so that remote clients can reach your services.
-
-Once the A record is in place and Caddy has issued certs, all your subdomains will be accessible over HTTPS.
-
-#### 11. Set up the Forgejo Actions runner
-
-CI/CD requires a runner registered against your Forgejo instance. After Forgejo is up:
-
-1. Create an admin account at `https://forgejo.yourdomain.com`
-2. Go to **Site Administration → Actions → Runners** and create a new runner token
-3. Install and register the runner on the server — see [Forgejo runner docs](https://forgejo.org/docs/latest/admin/actions/)
-
-Until the runner is registered, pushes to `main` won't trigger deploys. You can still deploy manually with `deploy-stack.sh`.
+1. **AdGuard** — configure DNS rewrites and upstream DNS via the web UI (`http://server-ip:3002`)
+2. **DNS** — add a wildcard A record in Porkbun pointing to your server IP
+3. **Forgejo runner** — register an Actions runner for CI/CD
 
 ---
 
-### Observability (optional)
+### Changing DNS provider
 
-```bash
-nano /opt/homelab/secrets/observability/grafana.env  # set admin password
-REPO_ROOT=/opt/homelab/repo /opt/homelab/repo/infra/scripts/deploy-stack.sh observability
-```
+This repo defaults to Porkbun. To use a different provider:
 
-Grafana available at `https://grafana.yourdomain.com`. Prometheus scrapes Node Exporter and cAdvisor automatically.
+1. Update the `(dns_tls)` snippet in `infra/docker/config/caddy/Caddyfile` to your provider's syntax
+2. Update env var names in `caddy.env` to match your provider
+3. Rebuild Caddy: `xcaddy build --with github.com/caddy-dns/<provider> --output /opt/homelab/caddy/caddy`
 
----
-
-### Media (optional)
-
-Update volume mounts to point at your drives:
-
-```bash
-nano /opt/homelab/repo/infra/docker/compose/media/docker-compose.yml
-# Set /mnt/media and /mnt/torrents to your actual mount points
-```
-
-If you have an NVIDIA GPU for Plex transcoding, ensure the NVIDIA Container Toolkit is installed. Otherwise remove the `runtime: nvidia` and `deploy.resources` block from the Plex service.
-
-```bash
-REPO_ROOT=/opt/homelab/repo /opt/homelab/repo/infra/scripts/deploy-stack.sh media
-```
-
----
-
-### Apps (optional)
-
-```bash
-# Optionally update the Calibre books path in docker-compose.yml
-nano /opt/homelab/repo/infra/docker/compose/apps/docker-compose.yml
-
-REPO_ROOT=/opt/homelab/repo /opt/homelab/repo/infra/scripts/deploy-stack.sh apps
-```
-
----
-
-### Home (optional)
-
-Update the Zigbee dongle device path and HA external URL:
-
-```bash
-nano /opt/homelab/repo/infra/docker/compose/home/docker-compose.yml     # update device path
-nano /opt/homelab/repo/infra/docker/config/homeassistant/configuration.yaml  # update external_url
-```
-
-```bash
-REPO_ROOT=/opt/homelab/repo /opt/homelab/repo/infra/scripts/deploy-stack.sh home
-```
+Full provider list: https://caddyserver.com/docs/modules/dns.providers
 
 ---
 
@@ -301,7 +154,7 @@ REPO_ROOT=/opt/homelab/repo /opt/homelab/repo/infra/scripts/deploy-stack.sh home
 Install Tailscale on the server, then configure split DNS in the Tailscale admin console:
 - **DNS → Nameservers**: add the server's Tailscale IP, restricted to `yourdomain.com`
 
-Point your Porkbun A records to the server's Tailscale IP. Remote clients on Tailscale will resolve `*.yourdomain.com` via AdGuard and route through Tailscale — no port forwarding needed.
+Point your Porkbun A record to the server's Tailscale IP. Remote clients on Tailscale resolve `*.yourdomain.com` via AdGuard and route through Tailscale — no port forwarding needed.
 
 ---
 
