@@ -10,34 +10,10 @@ automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
 
-adaptive_lighting:
-  - name: living_room
-    lights:
-      - light.living_room_light
-      - light.living_room_atrium_light
-      - light.living_room_floor_light
-      - light.table_light
-
-  - name: kitchen
-    lights: 
-      - light.kitchen_light
-
-  - name: bathroom
-    lights:
-      - light.bathroom_light
-
-  - name: bedroom
-    lights:
-      - light.bedroom_light
-      - light.bedroom_floor_light
-
-  - name: office
-    lights:
-      - light.office_light
-
-  - name: guest_bathroom
-    lights:
-      - light.guest_bathroom_light
+# adaptive_lighting:
+#   - name: example_room
+#     lights:
+#       - light.example_light
 
 homeassistant:
   external_url: https://homeassistant.yourdomain.com
