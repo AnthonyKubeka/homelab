@@ -1,0 +1,41 @@
+name: Deploy Home
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'infra/docker/compose/home/**'
+      - 'infra/docker/config/homeassistant/**'
+      - '.forgejo/workflows/deploy-home.yml'
+
+env:
+  REPO_ROOT: /opt/homelab/repo
+
+jobs:
+  deploy:
+    runs-on: normandy
+    steps:
+      - name: Update repo
+        run: |
+          cd $REPO_ROOT
+          git fetch origin
+          git reset --hard origin/main
+
+      - name: Write secrets
+        env:
+          SECRET_HOME_HA: ${{ secrets.SECRET_HOME_HA }}
+        run: |
+          mkdir -p /opt/homelab/data/homeassistant/config
+          [ -n "$SECRET_HOME_HA" ] && printf '%s\n' "$SECRET_HOME_HA" > /opt/homelab/data/homeassistant/config/secrets.yaml
+
+      - name: Sync Home Assistant config
+        run: |
+          mkdir -p /opt/homelab/data/homeassistant/config
+          rsync -av \
+            --exclude 'secrets.yaml' \
+            $REPO_ROOT/infra/docker/config/homeassistant/ \
+            /opt/homelab/data/homeassistant/config/
+
+      - name: Deploy home stack
+        run: $REPO_ROOT/infra/scripts/deploy-stack.sh home

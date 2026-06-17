@@ -1,0 +1,36 @@
+name: Deploy Core
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'infra/docker/compose/core/**'
+      - 'infra/docker/config/caddy/**'
+      - 'infra/scripts/**'
+      - '.forgejo/workflows/deploy-core.yml'
+
+env:
+  REPO_ROOT: /opt/homelab/repo
+
+jobs:
+  deploy:
+    runs-on: normandy
+    steps:
+      - name: Update repo
+        run: |
+          cd $REPO_ROOT
+          git fetch origin
+          git reset --hard origin/main
+
+      - name: Write secrets
+        env:
+          SECRET_CORE_CADDY: ${{ secrets.SECRET_CORE_CADDY }}
+          SECRET_CORE_FORGEJO: ${{ secrets.SECRET_CORE_FORGEJO }}
+        run: |
+          mkdir -p /opt/homelab/secrets/core
+          [ -n "$SECRET_CORE_CADDY" ]   && printf '%s\n' "$SECRET_CORE_CADDY"   > /opt/homelab/secrets/core/caddy.env
+          [ -n "$SECRET_CORE_FORGEJO" ] && printf '%s\n' "$SECRET_CORE_FORGEJO" > /opt/homelab/secrets/core/forgejo.env
+
+      - name: Deploy core stack
+        run: $REPO_ROOT/infra/scripts/deploy-stack.sh core

@@ -1,0 +1,11 @@
+[Unit]
+Description=Cleanup completed qBittorrent torrents for Radarr/Sonarr
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/qbt-cleanup.env
+ExecStart=/usr/bin/python3 /usr/local/bin/cleanup-qbt.py
+User=root
+Group=root

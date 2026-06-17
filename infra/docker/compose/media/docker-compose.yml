@@ -1,0 +1,94 @@
+services:
+  plex:
+    container_name: plex
+    image: lscr.io/linuxserver/plex:latest
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - VERSION=docker
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - /opt/homelab/data/plex/config:/config
+      - /opt/homelab/data/plex/transcode:/transcode
+      - /mnt/media:/media          # point this at your media drive
+    restart: unless-stopped
+    runtime: nvidia
+
+  qbittorrent:
+    container_name: qbittorrent
+    image: lscr.io/linuxserver/qbittorrent:latest
+    ports:
+      - "8080:8080"
+      - "6881:6881"
+      - "6881:6881/udp"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=002
+      - WEBUI_PORT=8080
+    volumes:
+      - /opt/homelab/data/qbittorrent/config:/config
+      - /mnt/torrents:/torrents              # completed downloads
+      - /mnt/torrents/incomplete:/incomplete  # in-progress downloads
+      - /mnt/media:/media                    # point this at your media drive
+    restart: unless-stopped
+
+  radarr:
+    container_name: radarr
+    image: lscr.io/linuxserver/radarr:latest
+    ports:
+      - "7878:7878"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=002
+    volumes:
+      - /opt/homelab/data/radarr/config:/config
+      - /mnt/media/movies:/movies
+      - /mnt/torrents:/torrents
+    restart: unless-stopped
+
+  sonarr:
+    container_name: sonarr
+    image: lscr.io/linuxserver/sonarr:latest
+    ports:
+      - "8989:8989"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=002
+    volumes:
+      - /opt/homelab/data/sonarr/config:/config
+      - /mnt/media/series:/series
+      - /mnt/torrents:/torrents
+    restart: unless-stopped
+
+  prowlarr:
+    container_name: prowlarr
+    image: lscr.io/linuxserver/prowlarr:latest
+    ports:
+      - "9696:9696"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=002
+    volumes:
+      - /opt/homelab/data/prowlarr/config:/config
+    restart: unless-stopped
+
+  flaresolverr:
+    container_name: flaresolverr
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    restart: unless-stopped
+    environment:
+      - LOG_LEVEL=info
+      - CAPTCHA_SOLVER=none
+    ports:
+      - "8191:8191"

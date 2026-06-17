@@ -1,0 +1,100 @@
+- Core:
+    - AdGuard Home:
+        href: https://adguard.yourdomain.com
+        description: DNS & ad blocking
+        icon: adguard-home.png
+        widget:
+          type: adguard
+          url: http://127.0.0.1:3002
+          username: {{HOMEPAGE_VAR_ADGUARD_USER}}
+          password: {{HOMEPAGE_VAR_ADGUARD_PASSWORD}}
+
+    - Forgejo:
+        href: https://forgejo.yourdomain.com
+        description: Self-hosted Git
+        icon: gitea.png
+
+    - Portainer:
+        href: https://portainer.yourdomain.com
+        description: Container management
+        icon: portainer.png
+        widget:
+          type: portainer
+          url: https://127.0.0.1:9443
+          env: 1
+          key: {{HOMEPAGE_VAR_PORTAINER_KEY}}
+
+- Media:
+    - Plex:
+        href: https://plex.yourdomain.com
+        description: Media server
+        icon: plex.png
+        widget:
+          type: plex
+          url: http://127.0.0.1:32400
+          key: {{HOMEPAGE_VAR_PLEX_TOKEN}}
+
+    - qBittorrent:
+        href: https://qbittorrent.yourdomain.com
+        description: Torrent client
+        icon: qbittorrent.png
+        widget:
+          type: qbittorrent
+          url: http://127.0.0.1:8080
+          username: {{HOMEPAGE_VAR_QBT_USER}}
+          password: {{HOMEPAGE_VAR_QBT_PASSWORD}}
+
+    - Radarr:
+        href: https://radarr.yourdomain.com
+        description: Movies
+        icon: radarr.png
+        widget:
+          type: radarr
+          url: http://127.0.0.1:7878
+          key: {{HOMEPAGE_VAR_RADARR_KEY}}
+
+    - Sonarr:
+        href: https://sonarr.yourdomain.com
+        description: TV series
+        icon: sonarr.png
+        widget:
+          type: sonarr
+          url: http://127.0.0.1:8989
+          key: {{HOMEPAGE_VAR_SONARR_KEY}}
+
+    - Prowlarr:
+        href: https://prowlarr.yourdomain.com
+        description: Indexer manager
+        icon: prowlarr.png
+
+- Observability:
+    - Grafana:
+        href: https://grafana.yourdomain.com
+        description: Metrics dashboards
+        icon: grafana.png
+
+    - Prometheus:
+        href: https://prometheus.yourdomain.com
+        description: Metrics collection
+        icon: prometheus.png
+
+- Apps:
+    - Calibre:
+        href: https://calibre.yourdomain.com
+        description: Ebook library
+        icon: calibre.png
+
+    - FileBrowser:
+        href: https://filebrowser.yourdomain.com
+        description: File manager
+        icon: filebrowser.png
+
+- Home:
+    - Home Assistant:
+        href: https://homeassistant.yourdomain.com
+        description: Home automation
+        icon: home-assistant.png
+        widget:
+          type: homeassistant
+          url: http://127.0.0.1:8123
+          key: {{HOMEPAGE_VAR_HA_TOKEN}}

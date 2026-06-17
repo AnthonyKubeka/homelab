@@ -1,0 +1,116 @@
+
+# DNS challenge TLS — using Porkbun here, but any provider works.
+# Replace the block below with your provider's Caddy DNS plugin syntax.
+# Full list: https://caddyserver.com/docs/modules/dns.providers
+# Build xcaddy with your chosen plugin: --with github.com/caddy-dns/<provider>
+(dns_tls) {
+	tls {
+		dns porkbun {
+			api_key {$PORKBUN_API_KEY}
+			api_secret_key {$PORKBUN_API_SECRET}
+		}
+	}
+}
+
+# stack: core
+adguard.{$HOMELAB_DOMAIN} {
+	import dns_tls
+	reverse_proxy 127.0.0.1:3002
+}
+
+# stack: core
+forgejo.{$HOMELAB_DOMAIN} {
+	import dns_tls
+	reverse_proxy 127.0.0.1:3000
+}
+
+# stack: core
+portainer.{$HOMELAB_DOMAIN} {
+	import dns_tls
+	reverse_proxy 127.0.0.1:9443 {
+		transport http {
+			tls_insecure_skip_verify
+		}
+	}
+}
+
+# stack: observability
+homepage.{$HOMELAB_DOMAIN} {
+	import dns_tls
+	reverse_proxy 127.0.0.1:3003
+}
+
+# stack: observability
+prometheus.{$HOMELAB_DOMAIN} {
+	import dns_tls
+	reverse_proxy 127.0.0.1:9090
+}
+
+# stack: observability
+grafana.{$HOMELAB_DOMAIN} {
+	import dns_tls
+	reverse_proxy 127.0.0.1:3001
+}
+
+# stack: apps
+# LSIO Calibre's desktop UI is served by KasmVNC, which enforces HTTPS on
+# container port 8181 (mapped to host 8185) with a self-signed cert. The
+# old HTTP port (host 8092 → container 8080) just errors with "requires
+# HTTPS", and the internal content server (host 8093 → container 8081) is
+# only started after the user manually enables it inside the Calibre UI.
+calibre.{$HOMELAB_DOMAIN} {
+	import dns_tls
+	reverse_proxy 127.0.0.1:8185 {
+		transport http {
+			tls_insecure_skip_verify
+		}
+	}
+}
+
+# stack: apps
+filebrowser.{$HOMELAB_DOMAIN} {
+	import dns_tls
+	reverse_proxy 127.0.0.1:8081
+}
+
+# stack: home
+homeassistant.{$HOMELAB_DOMAIN} {
+	import dns_tls
+	reverse_proxy 127.0.0.1:8123
+}
+
+# stack: media
+qbittorrent.{$HOMELAB_DOMAIN} {
+	import dns_tls
+	reverse_proxy 127.0.0.1:8080
+}
+
+# stack: media
+radarr.{$HOMELAB_DOMAIN} {
+	import dns_tls
+	reverse_proxy 127.0.0.1:7878
+}
+
+# stack: media
+sonarr.{$HOMELAB_DOMAIN} {
+	import dns_tls
+	reverse_proxy 127.0.0.1:8989
+}
+
+# stack: media
+prowlarr.{$HOMELAB_DOMAIN} {
+	import dns_tls
+	reverse_proxy 127.0.0.1:9696
+}
+
+# stack: media
+flaresolverr.{$HOMELAB_DOMAIN} {
+	import dns_tls
+	reverse_proxy 127.0.0.1:8191
+}
+
+# stack: media
+plex.{$HOMELAB_DOMAIN} {
+	import dns_tls
+	reverse_proxy 127.0.0.1:32400
+}

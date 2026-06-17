@@ -1,0 +1,15 @@
+title: Homelab
+theme: dark
+color: slate
+headerStyle: clean
+layout:
+  Core:
+    icon: mdi-server-network
+  Media:
+    icon: mdi-play-circle
+  Observability:
+    icon: mdi-chart-line
+  Apps:
+    icon: mdi-apps
+  Home:
+    icon: mdi-home-assistant

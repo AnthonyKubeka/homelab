@@ -1,0 +1,36 @@
+name: Deploy Observability
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'infra/docker/compose/observability/**'
+      - 'infra/docker/config/prometheus/**'
+      - 'infra/docker/config/homepage/**'
+      - '.forgejo/workflows/deploy-observability.yml'
+
+env:
+  REPO_ROOT: /opt/homelab/repo
+
+jobs:
+  deploy:
+    runs-on: normandy
+    steps:
+      - name: Update repo
+        run: |
+          cd $REPO_ROOT
+          git fetch origin
+          git reset --hard origin/main
+
+      - name: Write secrets
+        env:
+          SECRET_OBSERVABILITY_GRAFANA: ${{ secrets.SECRET_OBSERVABILITY_GRAFANA }}
+          SECRET_OBSERVABILITY_HOMEPAGE: ${{ secrets.SECRET_OBSERVABILITY_HOMEPAGE }}
+        run: |
+          mkdir -p /opt/homelab/secrets/observability
+          [ -n "$SECRET_OBSERVABILITY_GRAFANA" ]  && printf '%s\n' "$SECRET_OBSERVABILITY_GRAFANA"  > /opt/homelab/secrets/observability/grafana.env
+          [ -n "$SECRET_OBSERVABILITY_HOMEPAGE" ] && printf '%s\n' "$SECRET_OBSERVABILITY_HOMEPAGE" > /opt/homelab/secrets/observability/homepage.env
+
+      - name: Deploy observability stack
+        run: $REPO_ROOT/infra/scripts/deploy-stack.sh observability

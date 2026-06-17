@@ -1,0 +1,36 @@
+name: Deploy Apps
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'infra/docker/compose/apps/**'
+      - '.forgejo/workflows/deploy-apps.yml'
+
+env:
+  REPO_ROOT: /opt/homelab/repo
+
+jobs:
+  deploy:
+    runs-on: normandy
+    steps:
+      - name: Update repo
+        run: |
+          cd $REPO_ROOT
+          git fetch origin
+          git reset --hard origin/main
+
+      - name: Write secrets
+        env:
+          SECRET_APPS_FIREFLY: ${{ secrets.SECRET_APPS_FIREFLY }}
+          SECRET_APPS_FIREFLY_DB: ${{ secrets.SECRET_APPS_FIREFLY_DB }}
+          SECRET_APPS_FIREFLY_IMPORTER: ${{ secrets.SECRET_APPS_FIREFLY_IMPORTER }}
+        run: |
+          mkdir -p /opt/homelab/secrets/apps
+          [ -n "$SECRET_APPS_FIREFLY" ]          && printf '%s\n' "$SECRET_APPS_FIREFLY"          > /opt/homelab/secrets/apps/firefly.env
+          [ -n "$SECRET_APPS_FIREFLY_DB" ]       && printf '%s\n' "$SECRET_APPS_FIREFLY_DB"       > /opt/homelab/secrets/apps/firefly-db.env
+          [ -n "$SECRET_APPS_FIREFLY_IMPORTER" ] && printf '%s\n' "$SECRET_APPS_FIREFLY_IMPORTER" > /opt/homelab/secrets/apps/firefly-importer.env
+
+      - name: Deploy apps stack
+        run: $REPO_ROOT/infra/scripts/deploy-stack.sh apps

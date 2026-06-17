@@ -1,0 +1,31 @@
+services:
+  calibre:
+    image: lscr.io/linuxserver/calibre:latest
+    container_name: calibre
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Africa/Johannesburg
+    volumes:
+      - /opt/homelab/data/calibre/config:/config
+      - /mnt/media/books:/library    # point this at your books directory
+    ports:
+      - "8092:8080"
+      - "8185:8181"
+      - "8093:8081"
+    shm_size: "1gb"
+    restart: unless-stopped
+
+  filebrowser:
+    image: filebrowser/filebrowser:latest
+    container_name: filebrowser
+    ports:
+      - "8081:80"
+    volumes:
+      - /:/srv
+      - /opt/homelab/data/filebrowser/config:/config
+      - /opt/homelab/data/filebrowser/db:/database
+    environment:
+      - PUID=1000
+      - PGID=1000
+    restart: unless-stopped

@@ -1,0 +1,29 @@
+
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+# adaptive_lighting:
+#   - name: example_room
+#     lights:
+#       - light.example_light
+
+homeassistant:
+  external_url: https://homeassistant.yourdomain.com
+  internal_url: http://127.0.0.1:8123
+
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 127.0.0.1
+    - ::1
+    - 172.16.0.0/12
+    - 10.0.0.0/8
+    - 100.64.0.0/10

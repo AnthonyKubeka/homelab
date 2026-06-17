@@ -1,0 +1,31 @@
+name: Deploy Media
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'infra/docker/compose/media/**'
+      - '.forgejo/workflows/deploy-media.yml'
+
+env:
+  REPO_ROOT: /opt/homelab/repo
+
+jobs:
+  deploy:
+    runs-on: normandy
+    steps:
+      - name: Update repo
+        run: |
+          cd $REPO_ROOT
+          git fetch origin
+          git reset --hard origin/main
+
+      - name: Write secrets
+        env:
+          SECRET_QBT_CLEANUP: ${{ secrets.SECRET_QBT_CLEANUP }}
+        run: |
+          [ -n "$SECRET_QBT_CLEANUP" ] && printf '%s\n' "$SECRET_QBT_CLEANUP" > /etc/qbt-cleanup.env
+
+      - name: Deploy media stack
+        run: $REPO_ROOT/infra/scripts/deploy-stack.sh media
